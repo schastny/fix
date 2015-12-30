@@ -1,0 +1,37 @@
+11 ClOrdID                      37 OrderID
+30 LastMkt
+
+40 OrdType
+    1=Market	                8=LimitWithOrWithout	        F=Forex Limit*
+    2=Limit	                    9=OnBasis	                    G=Forex Swap
+    3=Stop	                    A=OnClose*	                    H=Forex PreviouslyQuoted*
+    4=StopLimit	                B=LimitOnClose*	                J=MarketIfTouched(MIT)
+    5=MarketOnClose*	        C=Forex Market*	                K=MarketWithLeftOverasLimit
+    6=WithOrWithout	            D=PreviouslyQuoted	            P=Pegged
+    7=LimitOrBetter	            E=PreviouslyIndicated	        Q=Counter-order selection
+    *No longer used
+59 TimeInForce
+    0=Day (or session)          3=Immediate Or Cancel (IOC)     6=Good Till Date (GTD)       
+    1=Good Till Cancel (GTC)    4=Fill Or Kill (FOK)            7=At the Close 
+    2=At the Opening (OPG)      5=Good Till Crossing (GTX)
+
+35 MsgType
+    0=Heartbeat	                A=Logon	                        l=BidResponse
+    1=TestRequest	            AB=NewOrder-Multileg	        r=OrderMassCancelReport
+    2=ResendRequest	            AC=MultilegOrderCancel/Replace	s=NewOrder-Cross
+    3=Reject	                D=NewOrder-Single	            t=CrossOrderCancel/ReplaceRequest
+    4=SequenceReset	            E=NewOrder-List	                u=CrossOrderCancelRequest
+    5=Logout	                F=OrderCancelRequest	        Z=QuoteCancel
+    6=IoI	                    G=OrderCancel/ReplaceRequest	z=DerivativeSecurityListRequest
+    8=ExecutionReport	        H=OrderStatusRequest	
+    9=OrderCancelReject	        k=BidRequest	
+150 ExecType
+    0=New	                    5=Replace	                    A=PendingNew
+    1=Partial fill	            6=PendingCancel	                B=Calculated
+    2=Fill	                    7=Stopped	                    C=Expired
+    3=Doneforday	            8=Rejected	                    D=Restated
+    4=Canceled	                9=Suspended	                    E=PendingReplace
+
+49 SenderCompID                 50 SenderSubID                  115 OnBehalfOfCompID
+56 TargetCompID                 57 TargetSubID
+100 ExDestination               109 ClientID                    58 Text
