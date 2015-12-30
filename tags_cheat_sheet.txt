@@ -27,7 +27,7 @@
     9=OrderCancelReject	        k=BidRequest	
 150 ExecType
     0=New	                5=Replace	                A=PendingNew
-    1=Partial fill	        6=PendingCancel	              B=Calculated
+    1=Partial fill	        6=PendingCancel	                B=Calculated
     2=Fill	                7=Stopped	                C=Expired
     3=Doneforday	        8=Rejected	                D=Restated
     4=Canceled	                9=Suspended	                E=PendingReplace
