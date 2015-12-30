@@ -3,11 +3,11 @@
 
 40 OrdType
     1=Market	                8=LimitWithOrWithout	        F=Forex Limit*
-    2=Limit	                9=OnBasis	                    G=Forex Swap
-    3=Stop	                A=OnClose*	                    H=Forex PreviouslyQuoted*
+    2=Limit	                9=OnBasis	              G=Forex Swap
+    3=Stop	                A=OnClose*	              H=Forex PreviouslyQuoted*
     4=StopLimit	                B=LimitOnClose*	                J=MarketIfTouched(MIT)
     5=MarketOnClose*	        C=Forex Market*	                K=MarketWithLeftOverasLimit
-    6=WithOrWithout	        D=PreviouslyQuoted	            P=Pegged
+    6=WithOrWithout	        D=PreviouslyQuoted	     P=Pegged
     7=LimitOrBetter	        E=PreviouslyIndicated	        Q=Counter-order selection
     *No longer used
 59 TimeInForce
