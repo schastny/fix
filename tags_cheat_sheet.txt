@@ -3,11 +3,11 @@
 
 40 OrdType
     1=Market	                8=LimitWithOrWithout	        F=Forex Limit*
-    2=Limit	                9=OnBasis	              G=Forex Swap
-    3=Stop	                A=OnClose*	              H=Forex PreviouslyQuoted*
+    2=Limit	                9=OnBasis	                G=Forex Swap
+    3=Stop	                A=OnClose*	                H=Forex PreviouslyQuoted*
     4=StopLimit	                B=LimitOnClose*	                J=MarketIfTouched(MIT)
     5=MarketOnClose*	        C=Forex Market*	                K=MarketWithLeftOverasLimit
-    6=WithOrWithout	        D=PreviouslyQuoted	     P=Pegged
+    6=WithOrWithout	        D=PreviouslyQuoted	        P=Pegged
     7=LimitOrBetter	        E=PreviouslyIndicated	        Q=Counter-order selection
     *No longer used
 59 TimeInForce
@@ -19,7 +19,7 @@
     0=Heartbeat	                A=Logon	                        l=BidResponse
     1=TestRequest	        AB=NewOrder-Multileg	        r=OrderMassCancelReport
     2=ResendRequest	        AC=MultilegOrderCancel/Replace	s=NewOrder-Cross
-    3=Reject	                D=NewOrder-Single	            t=CrossOrderCancel/ReplaceRequest
+    3=Reject	                D=NewOrder-Single	        t=CrossOrderCancel/ReplaceRequest
     4=SequenceReset	        E=NewOrder-List	                u=CrossOrderCancelRequest
     5=Logout	                F=OrderCancelRequest	        Z=QuoteCancel
     6=IoI	                G=OrderCancel/ReplaceRequest	z=DerivativeSecurityListRequest
