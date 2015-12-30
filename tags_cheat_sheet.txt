@@ -22,7 +22,7 @@
     3=Reject	                D=NewOrder-Single	            t=CrossOrderCancel/ReplaceRequest
     4=SequenceReset	        E=NewOrder-List	                u=CrossOrderCancelRequest
     5=Logout	                F=OrderCancelRequest	        Z=QuoteCancel
-    6=IoI	                    G=OrderCancel/ReplaceRequest	z=DerivativeSecurityListRequest
+    6=IoI	                G=OrderCancel/ReplaceRequest	z=DerivativeSecurityListRequest
     8=ExecutionReport	        H=OrderStatusRequest	
     9=OrderCancelReject	        k=BidRequest	
 150 ExecType
