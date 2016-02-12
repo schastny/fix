@@ -196,3 +196,29 @@ public static void main(java.lang.String[]);
 
 }
 ```
+
+## JVM Structure
+Java Source (.java)   
+↓  
+(javac)   
+↓  
+Java Byte Code (.class)  
+↓   
+JVM
+* Class Loader
+* Execution Engine
+* Runtime Data Areas
+
+![Java Ccode Execution Process](img/java-code-execution-process.png)
+
+A class loader loads the compiled Java Bytecode to the Runtime Data Areas, and the execution engine executes the Java Bytecode.
+
+### Class Loader
+
+Java provides a dynamic load feature; it loads and links the class when it refers to a class for the first time at runtime, not compile time. JVM's class loader executes the dynamic load. The features of Java class loader are as follows:  
+* **Hierarchical Structure:** Class loaders in Java are organized into a hierarchy with a parent-child relationship. The Bootstrap Class Loader is the parent of all class loaders.
+* **Delegation mode:** Based on the hierarchical structure, load is delegated between class loaders. When a class is loaded, the parent class loader is checked to determine whether or not the class is in the parent class loader. If the upper class loader has the class, the class is used. If not, the class loader requested for loading loads the class.
+* **Visibility limit:** A child class loader can find the class in the parent class loader; however, a parent class loader cannot find the class in the child class loader.
+* **Unload is not allowed:** A class loader can load a class but cannot unload it. Instead of unloading, the current class loader can be deleted, and a new class loader can be created.
+
+Each class loader has its namespace that stores the loaded classes. When a class loader loads a class, it searches the class based on *FQCN (Fully Qualified Class Name)* stored in the namespace to check whether or not the class has been already loaded. Even if the class has an identical FQCN but a different namespace, it is regarded as a different class. A different namespace means that the class has been loaded by another class loader.
