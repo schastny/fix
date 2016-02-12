@@ -198,6 +198,7 @@ public static void main(java.lang.String[]);
 ```
 
 ## JVM Structure
+>
 Java Source (.java)   
 ↓  
 (javac)   
@@ -208,8 +209,6 @@ JVM
 * Class Loader
 * Execution Engine
 * Runtime Data Areas
-
-![Java Ccode Execution Process](img/java-code-execution-process.png)
 
 A class loader loads the compiled Java Bytecode to the Runtime Data Areas, and the execution engine executes the Java Bytecode.
 
@@ -222,3 +221,21 @@ Java provides a dynamic load feature; it loads and links the class when it refer
 * **Unload is not allowed:** A class loader can load a class but cannot unload it. Instead of unloading, the current class loader can be deleted, and a new class loader can be created.
 
 Each class loader has its namespace that stores the loaded classes. When a class loader loads a class, it searches the class based on *FQCN (Fully Qualified Class Name)* stored in the namespace to check whether or not the class has been already loaded. Even if the class has an identical FQCN but a different namespace, it is regarded as a different class. A different namespace means that the class has been loaded by another class loader.
+
+### The class loader delegation model
+>
+Bootstrap class loader  
+↑  
+Extension class loader  
+↑  
+System class loader  
+↑  
+User-defined class loader   
+↑  
+User-defined class loader  
+
+When a class loader is requested for class load, it checks whether or not the class exists in the class loader cache, the parent class loader, and itself, in the order listed. In short, it checks whether or not the class has been loaded in the class loader cache. If not, it checks the parent class loader. If the class is not found in the bootstrap class loader, the requested class loader searches for the class in the file system.
+* **Bootstrap class loader:** This is created when running the JVM. It loads Java APIs, including object classes. Unlike other class loaders, it is implemented in native code instead of Java.
+* **Extension class loader:** It loads the extension classes excluding the basic Java APIs. It also loads various security extension functions.
+* **System class loader:** If the bootstrap class loader and the extension class loader load the JVM components, the system class loader loads the application classes. It loads the class in the $CLASSPATH specified by the user.
+* **User-defined class loader:** This is a class loader that an application user directly creates on the code.
