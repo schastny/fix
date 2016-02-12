@@ -234,8 +234,82 @@ User-defined class loader
 ↑  
 User-defined class loader  
 
+![class-loader-delegation-model.png](http://www.cubrid.org/files/attach/images/220547/468/290/class-loader-delegation-model.png)
+
 When a class loader is requested for class load, it checks whether or not the class exists in the class loader cache, the parent class loader, and itself, in the order listed. In short, it checks whether or not the class has been loaded in the class loader cache. If not, it checks the parent class loader. If the class is not found in the bootstrap class loader, the requested class loader searches for the class in the file system.
 * **Bootstrap class loader:** This is created when running the JVM. It loads Java APIs, including object classes. Unlike other class loaders, it is implemented in native code instead of Java.
 * **Extension class loader:** It loads the extension classes excluding the basic Java APIs. It also loads various security extension functions.
 * **System class loader:** If the bootstrap class loader and the extension class loader load the JVM components, the system class loader loads the application classes. It loads the class in the $CLASSPATH specified by the user.
 * **User-defined class loader:** This is a class loader that an application user directly creates on the code.
+
+Frameworks such as Web application server (WAS) use it to make Web applications and enterprise applications run independently. In other words, this guarantees the independence of applications through class loader delegation model. Such a WAS class loader structure uses a hierarchical structure that is slightly different for each WAS vendor.
+
+If a class loader finds an unloaded class, the class is loaded and linked by following the process illustrated below.
+
+### Class Load Stage
+
+![class-load-stage](http://www.cubrid.org/files/attach/images/220547/468/290/class-load-stage.png)
+
+* **Loading:** A class is obtained from a file and loaded to the JVM memory.
+* **Verifying:** Check whether or not the read class is configured as described in the Java Language Specification and JVM specifications. This is the most complicated test process of the class load processes, and takes the longest time. Most cases of the JVM TCK test cases are to test whether or not a verification error occurs by loading wrong classes.
+* **Preparing:** Prepare a data structure that assigns the memory required by classes and indicates the fields, methods, and interfaces defined in the class.
+* **Resolving:** Change all symbolic references in the constant pool of the class to direct references.
+* **Initializing:** Initialize the class variables to proper values. Execute the static initializers and initialize the static fields to the configured values.
+
+### Runtime Data Areas
+![runtime-data-access-configuration.png](http://www.cubrid.org/files/attach/images/220547/468/290/runtime-data-access-configuration.png)
+
+Runtime Data Areas are the memory areas assigned when the JVM program runs on the OS.   
+**Are created per one thread:**
+* PC Register 
+* JVM Stack
+* Native Method Stack  
+
+**Shared by all threads:**
+* Heap
+* Method Area
+* Runtime Constant Pool
+
+**PC register:** PC (Program Counter) register exists per thread, and is created when the thread starts. PC register has the address of a JVM instruction being executed now.  
+**JVM stack:** JVM stack exists per a thread, and is created when the thread starts. It is a stack that saves the struct (Stack Frame). The JVM just pushes or pops the stack frame to the JVM stack. If any exception occurs, each line of the stack trace shown as a method such as printStackTrace() expresses one stack frame.
+![jvm-stack-configuration.png](http://www.cubrid.org/files/attach/images/220547/468/290/jvm-stack-configuration.png)
+
+* *Stack frame:* One stack frame is created whenever a method is executed in the JVM, and the stack frame is added to the JVM stack of the thread. When the method is ended, the stack frame is removed.  
+Each stack frame has the reference for Local Variable Array, Operand Stack, and runtime Constant Pool of a class where the method being executed belongs.  
+The size of Local Variable Array and Operand Stack is determined while compiling. Therefore, the size of stack frame is fixed according to the method.  
+* *Local variable array:* It has an index starting from 0.  
+0 is the reference of a class instance where the method belongs.  
+From 1, the parameters sent to the method are saved. After the method parameters, the local variables of the method are saved.
+* *Operand stack:* An actual workspace of a method. Each method exchanges data between the Operand stack and the Local Variable Array, and pushes or pops other method invoke results.  
+The necessary size of the Operand Stack space can be determined during compiling. Therefore, the size of the Operand Stack can also be determined during compiling.
+
+**Native method stack:** A stack for native code written in a language other than Java. In other words, it is a stack used to execute C/C++ codes invoked through JNI (Java Native Interface). According to the language, a C stack or C++ stack is created.  
+**Method area (PermGen)** The method area is shared by all threads, created when the JVM starts. It stores runtime constant pool, field and method information, static variable, and method bytecode for each of the classes and interfaces read by the JVM. The method area can be implemented in various formats by JVM vendor. Oracle Hotspot JVM calls it *Permanent Area or Permanent Generation (PermGen)*.   
+The garbage collection for the method area is optional for each JVM vendor.  
+**Runtime constant pool:** An area that corresponds to the constant_pool table in the class file format. This area is included in the method area; however, it plays the most core role in JVM operation. Therefore, the JVM specification separately describes its importance. As well as the constant of each class and interface, it contains all references for methods and fields.  
+In short, when a method or field is referred to, the JVM searches the actual address of the method or field on the memory by using the runtime constant pool.  
+**Heap:** A space that stores instances or objects, and is a target of garbage collection. This space is most frequently mentioned when discussing issues such as JVM performance. JVM vendors can determine how to configure the heap or not to collect garbage.
+
+### Going back to the disassembled bytecode we discussed previously
+```
+public void add(java.lang.String);
+  Code:
+   0:   aload_0
+   1:   getfield        #15; //Field admin:Lcom/nhn/user/UserAdmin;
+   4:   aload_1
+   5:   invokevirtual   #23; //Method com/nhn/user/UserAdmin.addUser:(Ljava/lang/String;)Lcom/nhn/user/User;
+   8:   pop
+   9:   return
+```
+
+Comparing the disassembled code (OpCode) and the assembly code of the x86 architecture, the two have a similar format. However, the difference is that Java Bytecode does not write *register name*, *memory addressor*, or *offset* on the Operand.   
+As described before, the JVM uses *stack*, not *registers*. And it uses *index numbers* such as 15 and 23 instead of memory addresses since it manages the memory by itself.  
+The 15 and 23 are the indexes of the constant pool of the current class (here, UserService class). In short, the JVM creates a constant pool for each class, and the pool stores the reference of the actual target.
+
+Each row of the disassembled code is interpreted as follows.
+* **aload_0:** Add the #0 index of the local variable array to the Operand stack. The #0 index of the local variable array is always this, the reference for the current class instance.
+* **getfield #15:** In the current class constant pool, add the #15 index to the Operand stack. UserAdmin admin field is added. Since the admin field is a class instance, a reference is added.
+* **aload_1:** Add the #1 index of the local variable array to the Operand stack. From the #1 index of the local variable array, it is a method parameter. Therefore, the reference of String userName sent while invoking add() is added.
+* **invokevirtual #23:** Invoke the method corresponding to the #23 index in the current class constant pool. At this time, the reference added by using getfield and the parameter added by using aload_1 are sent to the method to invoke. When the method invocation is completed, add the return value to the Operand stack.
+* **pop:** Pop the return value of invoking by using invokevirtual from the Operand stack. You can see that the code compiled by the previous library has no return value. In short, the previous has no return value, so there was no need to pop the return value from the stack.
+* **return:** Complete the method.
