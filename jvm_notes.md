@@ -271,7 +271,7 @@ Runtime Data Areas are the memory areas assigned when the JVM program runs on th
 * Runtime Constant Pool
 
 **PC register:** PC (Program Counter) register exists per thread, and is created when the thread starts. PC register has the address of a JVM instruction being executed now.  
-**JVM stack:** JVM stack exists per a thread, and is created when the thread starts. It is a stack that saves the struct (Stack Frame). The JVM just pushes or pops the stack frame to the JVM stack. If any exception occurs, each line of the stack trace shown as a method such as printStackTrace() expresses one stack frame.
+**JVM stack:** JVM stack exists per a thread, and is created when the thread starts. It is a stack that saves the struct (Stack Frame). The JVM just pushes or pops the stack frame to the JVM stack. If any exception occurs, each line of the stack trace shown as a method such as printStackTrace() expresses one stack frame.  
 ![jvm-stack-configuration.png](http://www.cubrid.org/files/attach/images/220547/468/290/jvm-stack-configuration.png)
 
 * *Stack frame:* One stack frame is created whenever a method is executed in the JVM, and the stack frame is added to the JVM stack of the thread. When the method is ended, the stack frame is removed.  
@@ -315,7 +315,7 @@ Each row of the disassembled code is interpreted as follows.
 * **return:** Complete the method.
 
 #### Example of Java Bytecode Loaded on Runtime Data Areas
-The following figure will help you understand the explanation.
+The following figure will help you understand the explanation.  
 ![example-of-java-bytecode-loaded-on-runtime-data-areas.png](http://www.cubrid.org/files/attach/images/220547/468/290/example-of-java-bytecode-loaded-on-runtime-data-areas.png)
 
 For reference, in this method, no local variable array has been changed. So the figure above displays the changes in Operand stack only. However, in most cases, local variable array is also changed. Data transfer between the local variable array and the Operand stack is made by using a lot of load instructions (aload, iload) and store instructions (astore, istore). 
@@ -334,12 +334,12 @@ The bytecode can be changed to the suitable language in one of two ways:
 **Interpreter:** Reads, interprets and executes the bytecode instructions one by one. As it interprets and executes instructions one by one, it can quickly interpret one bytecode, but slowly executes the interpreted result. This is the disadvantage of the interpret language. The 'language' called Bytecode basically runs like an interpreter.  
 **JIT (Just-In-Time) compiler:** The JIT compiler has been introduced to compensate for the disadvantages of the interpreter. The execution engine runs as an interpreter first, and at the appropriate time, the JIT compiler compiles the entire bytecode to change it to native code. After that, the execution engine no longer interprets the method, but directly executes using native code. Execution in native code is much faster than interpreting instructions one by one. The compiled code can be executed quickly since the native code is stored in the cache.
  
-However, it takes more time for JIT compiler to compile the code than for the interpreter to interpret the code one by one. Therefore, if the code is to be executed just once, it is better to interpret it instead of compiling. *Therefore, the JVMs that use the JIT compiler internally check how frequently the method is executed and compile the method only when the frequency is higher than a certain level.*
+However, it takes more time for JIT compiler to compile the code than for the interpreter to interpret the code one by one. Therefore, if the code is to be executed just once, it is better to interpret it instead of compiling. *Therefore, the JVMs that use the JIT compiler internally check how frequently the method is executed and compile the method only when the frequency is higher than a certain level.*  
 ![java-compiler-and-jit-compiler.png](http://www.cubrid.org/files/attach/images/220547/468/290/java-compiler-and-jit-compiler.png)
 
 How the execution engine runs is not defined in the JVM specifications. Therefore, JVM vendors improve their execution engines using various techniques, and introduce various types of JIT compilers. 
 
-Most JIT compilers run as shown in the figure below: 
+Most JIT compilers run as shown in the figure below:  
 ![jit-compiler.png](http://www.cubrid.org/files/attach/images/220547/468/290/jit-compiler.png)
 
 The JIT compiler converts the bytecode to an intermediate-level expression, IR (Intermediate Representation), to execute optimization, and then converts the expression to native code.
