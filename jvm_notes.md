@@ -313,3 +313,153 @@ Each row of the disassembled code is interpreted as follows.
 * **invokevirtual #23:** Invoke the method corresponding to the #23 index in the current class constant pool. At this time, the reference added by using getfield and the parameter added by using aload_1 are sent to the method to invoke. When the method invocation is completed, add the return value to the Operand stack.
 * **pop:** Pop the return value of invoking by using invokevirtual from the Operand stack. You can see that the code compiled by the previous library has no return value. In short, the previous has no return value, so there was no need to pop the return value from the stack.
 * **return:** Complete the method.
+
+#### Example of Java Bytecode Loaded on Runtime Data Areas
+The following figure will help you understand the explanation.
+![example-of-java-bytecode-loaded-on-runtime-data-areas.png](http://www.cubrid.org/files/attach/images/220547/468/290/example-of-java-bytecode-loaded-on-runtime-data-areas.png)
+
+For reference, in this method, no local variable array has been changed. So the figure above displays the changes in Operand stack only. However, in most cases, local variable array is also changed. Data transfer between the local variable array and the Operand stack is made by using a lot of load instructions (aload, iload) and store instructions (astore, istore). 
+
+In this figure, we have checked the brief description of the runtime constant pool and the JVM stack. When the JVM runs, each class instance will be assigned to the heap, and class information including User, UserAdmin, UserService, and String will be stored in the method area.
+
+### Execution Engine
+The bytecode that is assigned to the runtime data areas in the JVM via class loader is executed by the execution engine. The execution engine reads the Java Bytecode in the unit of instruction. It is like a CPU executing the machine command one by one. Each command of the bytecode consists of a 1-byte OpCode and additional Operand. The execution engine gets one OpCode and execute task with the Operand, and then executes the next OpCode.
+
+But the Java Bytecode is written in a language that a human can understand, rather than in the language that the machine directly executes. Therefore, the execution engine must change the bytecode *to the language that can be executed by the machine in the JVM.* 
+
+The bytecode can be changed to the suitable language in one of two ways:
+- Interpreter
+- JIT (Just-In-Time) compiler
+
+**Interpreter:** Reads, interprets and executes the bytecode instructions one by one. As it interprets and executes instructions one by one, it can quickly interpret one bytecode, but slowly executes the interpreted result. This is the disadvantage of the interpret language. The 'language' called Bytecode basically runs like an interpreter.  
+**JIT (Just-In-Time) compiler:** The JIT compiler has been introduced to compensate for the disadvantages of the interpreter. The execution engine runs as an interpreter first, and at the appropriate time, the JIT compiler compiles the entire bytecode to change it to native code. After that, the execution engine no longer interprets the method, but directly executes using native code. Execution in native code is much faster than interpreting instructions one by one. The compiled code can be executed quickly since the native code is stored in the cache.
+ 
+However, it takes more time for JIT compiler to compile the code than for the interpreter to interpret the code one by one. Therefore, if the code is to be executed just once, it is better to interpret it instead of compiling. *Therefore, the JVMs that use the JIT compiler internally check how frequently the method is executed and compile the method only when the frequency is higher than a certain level.*
+![java-compiler-and-jit-compiler.png](http://www.cubrid.org/files/attach/images/220547/468/290/java-compiler-and-jit-compiler.png)
+
+How the execution engine runs is not defined in the JVM specifications. Therefore, JVM vendors improve their execution engines using various techniques, and introduce various types of JIT compilers. 
+
+Most JIT compilers run as shown in the figure below: 
+![jit-compiler.png](http://www.cubrid.org/files/attach/images/220547/468/290/jit-compiler.png)
+
+The JIT compiler converts the bytecode to an intermediate-level expression, IR (Intermediate Representation), to execute optimization, and then converts the expression to native code.
+
+**Oracle Hotspot VM** uses a JIT compiler called **Hotspot Compiler**. It is called Hotspot because Hotspot Compiler searches the 'Hotspot' that requires compiling with the highest priority through profiling, and then it compiles the hotspot to native code.   
+If the method that has the bytecode compiled is no longer frequently invoked, in other words, if the method is not the hotspot any more, the Hotspot VM removes the native code from the cache and runs in interpreter mode.  
+The Hotspot VM is divided into the *Server VM* and the *Client VM*, and the two VMs use different JIT compilers.  
+
+![hotspot-client-vm-and-server-vm.png](http://www.cubrid.org/files/attach/images/220547/468/290/hotspot-client-vm-and-server-vm.png)  
+The client VM and the server VM use an identical runtime; however, they use different JIT compilers, as shown in the above figure. The client VM and the server VM use an identical runtime, however, they use different JIT compilers as shown in the above figure. Advanced Dynamic Optimizing Compiler used by the server VM uses more complex and diverse performance optimization techniques.
+
+**IBM JVM** has introduced **AOT (Ahead-Of-Time) Compiler** from IBM JDK 6 as well as the JIT compiler. This means that many JVMs share the native code compiled through the shared cache. In short, the code that has been already compiled through the AOT compiler can be used by another JVM without compiling. In addition, IBM JVM provides a fast way of execution by pre-compiling code to JXE (Java EXecutable) file format using the AOT compiler.  
+
+Most Java performance improvement is accomplished by improving the execution engine. As well as the JIT compiler, various optimization techniques are being introduced so the JVM performance can be continuously improved. The biggest difference between the initial JVM and the latest JVM is the execution engine.
+
+Hotspot compiler has been introduced to Oracle Hotspot VM from version 1.3, and JIT compiler has been introduced to Dalvik VM from Android 2.2.
+
+## The Java Virtual Machine Specification, Java SE 7 Edition
+On 28th July, 2011, Oracle released Java SE 7 and updated the JVM Spec to Java SE 7 version. After releasing "The Java Virtual Machine Specification, Second Edition" in 1999, it took 12 years for Oracle to release the updated version. The updated version includes various changes and modifications accumulated over 12 years, and describes more clear specifications. In addition, it reflects the contents included in "The Java Language Specification, Java SE 7 Edition" released with Java SE 7. The major changes can be summarized as follows:
+* Generics introduced from Java SE 5.0, supporting variable argument method
+* Bytecode verification process technique changed since Java SE 6
+* Added **invokedynamic** instruction and related class file formats for supporting dynamic type languages
+* Deleted the description of the concept of the Java language itself and referred reader to the Java language specifications
+* Deleted the description on Java Thread and Lock, and transferred these to the Java language specifications
+
+The biggest change of these is the addition of *invokedynamic* instruction. *This means that a change was made in the JVM internal instruction sets, as the JVM started to support dynamic type languages of which type is not fixed, such as script languages, as well as Java language from Java SE 7.* The OpCode 186 which had not been used previously has been assigned to the new instruction, invokedynamic, and new contents have been added to the class file format to support the invokedynamic.
+
+The version of the class file created by the Java compiler of Java SE 7 is **51.0**. The version of Java SE 6 is **50.0**.  
+Much of the class file format has been changed. Therefore, class files with version 51.0 cannot be executed in the Java SE 6 JVM. 
+
+Despite these various changes, *the 65535 byte limit of the Java method has not been removed*. Unless the JVM class file format is innovatively changed, it may not be removed in the future.
+
+For reference, Oracle Java SE 7 VM supports **G1**, the new garbage collection; however, it is limited to the Oracle JVM, so JVM itself does not limit any garbage collection type. Therefore, the JVM specifications do not describe that.
+
+### String in switch Statements
+Java SE 7 adds various grammars and features. However, compared to the various changes in language of Java SE 7, **there are not so many changes in the JVM. So, how can the new features of the Java SE 7 be implemented?**  
+
+We will see how String in switch Statements (a function to add a string to a switch() statement as a comparison) has been implemented in Java SE 7 by disassembling it.
+
+For example, the following code has been written.
+
+```
+// SwitchTest
+public class SwitchTest {
+    public int doSwitch(String str) {
+        switch (str) {
+        case "abc":        return 1;
+        case "123":        return 2;
+        default:           return 0;
+        }
+    }
+}
+```
+
+Since it is a new function of Java SE 7, it cannot be compiled using the Java compiler for Java SE 6 or lower versions. Compile it using the javac of Java SE 7. The following screen is the compiling result printed by using javap –c.
+
+```
+$>javap -c SwitchTest.classCompiled from "SwitchTest.java"
+public class SwitchTest {
+  public SwitchTest();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return  public int doSwitch(java.lang.String);
+    Code:
+       0: aload_1
+       1: astore_2
+       2: iconst_m1
+       3: istore_3
+       4: aload_2
+       5: invokevirtual #2                  // Method java/lang/String.hashCode:()I
+       8: lookupswitch  { // 2
+                 48690: 50
+                 96354: 36
+               default: 61
+          }
+      36: aload_2
+      37: ldc           #3                  // String abc
+      39: invokevirtual #4                  // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      42: ifeq          61
+      45: iconst_0
+      46: istore_3
+      47: goto          61
+      50: aload_2
+      51: ldc           #5                  // String 123
+      53: invokevirtual #4                  // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      56: ifeq          61
+      59: iconst_1
+      60: istore_3
+      61: iload_3
+      62: lookupswitch  { // 2
+                     0: 88
+                     1: 90
+               default: 92
+          }
+      88: iconst_1
+      89: ireturn
+      90: iconst_2
+      91: ireturn
+      92: iconst_0
+      93: ireturn
+```
+
+A significantly longer bytecode than the Java source code has been created. First, you can see that lookupswitch instruction has been used for switch() statement in Java bytecode. However, two lookupswitch instructions have been used, not the one lookupswitch instruction. When disassembling the case in which int has been added to switch() statement, only one lookupswitch instruction has been used. This means that the switch() statement has been divided into two statements to process the string. See the annotation of the #5, #39, and #53 byte instructions to see how the switch() statement has processed the string.
+
+In the #5 and #8 byte, first, hashCode() method has been executed and switch(int) has been executed by using the result of executing hashCode() method. In the braces of the lookupswitch instruction, branch is made to the different location according to the hashCode result value. String "abc" is hashCode result value 96354, and is moved to #36 byte. String "123" is hashCode result value 48690, and is moved to #50 byte.
+
+In the #36, #37, #39, and #42 bytes, you can see that the value of the str variable received as an argument is compared using the String "abc" and the equals() method. If the results are identical, '0' is inserted to the #3 index of the local variable array, and the string is moved to the #61 byte.
+
+In this way, in the #50, #51, #53, and #56 bytes, you can see that the value of the str variable received as an argument is compared by using the String "123" and the equals() method. If the results are identical, '1' is inserted to the #3 index of the local variable array and the string is moved to the #61 byte.
+
+In the #61 and #62 bytes, the value of the #3 index of the local variable array, i.e., '0', '1', or any other value, is lookupswitched and branched.
+
+In other words, in Java code, the value of the str variable received as the switch() argument is compared using the hashCode() method and the equals() method. With the result int value, switch() is executed.
+
+In this result, the compiled bytecode is not different from the previous JVM specifications. The new feature of Java SE 7, String in switch is processed by the Java compiler, not by the JVM itself. In this way, other new features of Java SE 7 will also be processed by the Java compiler.
+
+## Conclusion
+I don't think that we need to review how Java has been developed to use Java well. So many Java developers develop great applications and libraries without understanding JVM deeply. However, if you understand JVM, you will understand Java more, and it will be helpful to solve the problems like the case we have reviewed here.
+
+Besides the description mentioned here, the JVM has various features and technologies. The JVM specifications provide a flexible specification for JVM vendors to provide more advanced performance so that various technologies can be applied by the vendor. 
+
+In particular, **garbage collection** is the technique used by most languages that provides usability similar to that of a VM, the latest and state-of-the-art technique in its performance.
