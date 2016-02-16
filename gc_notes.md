@@ -1,2 +1,5 @@
-[1](http://www.cubrid.org/blog/dev-platform/understanding-java-garbage-collection/)
-[2](http://www.cubrid.org/blog/dev-platform/how-to-monitor-java-garbage-collection/)
+* [Understanding Java Garbage Collection](http://www.cubrid.org/blog/dev-platform/understanding-java-garbage-collection/)  
+* [How to Monitor Java Garbage Collection](http://www.cubrid.org/blog/dev-platform/how-to-monitor-java-garbage-collection/)
+* [How to Tune Java Garbage Collection](http://www.cubrid.org/blog/dev-platform/how-to-tune-java-garbage-collection/)
+* [MaxClients in Apache and its effect on Tomcat during Full GC](http://www.cubrid.org/blog/dev-platform/maxclients-in-apache-and-its-effect-on-tomcat-during-full-gc/)
+* [The Principles of Java Application Performance Tuning](http://www.cubrid.org/blog/dev-platform/the-principles-of-java-application-performance-tuning/)
