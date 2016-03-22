@@ -25,6 +25,16 @@
     6=IoI	                G=OrderCancel/ReplaceRequest	z=DerivativeSecurityListRequest
     8=ExecutionReport	        H=OrderStatusRequest	
     9=OrderCancelReject	        k=BidRequest	
+    
+39 OrdStatus  
+    2 Filled
+    4 Cancelled
+    C Expired
+    1 Partially Filled
+    0 New
+    8 Rejected
+    9 Suspended
+    
 150 ExecType
     0=New	                5=Replace	                A=PendingNew
     1=Partial fill	        6=PendingCancel	                B=Calculated
